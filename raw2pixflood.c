@@ -4,6 +4,13 @@
 #include <unistd.h>
 #include <string.h>
 
+
+#ifndef THRESH
+#define THRESH 2
+#endif
+
+#define CMP(x,y) (((x-y) <= THRESH) && ((y-x) <= THRESH))
+
 int write_pixbuf(int fd, uint16_t x, uint16_t y,
                  uint16_t in_width, uint16_t in_height, uint8_t *raw_in,
                  uint8_t *in_diff, size_t n_in, char *buf, size_t n_buf)
@@ -19,9 +26,9 @@ int write_pixbuf(int fd, uint16_t x, uint16_t y,
                 g = raw_in[rin-1];
                 b = raw_in[rin];
 
-                if(r == in_diff[rin-2] &&
-                   g == in_diff[rin-1] &&
-                   b == in_diff[rin])
+                if(CMP(r, in_diff[rin-2]) &&
+                   CMP(g, in_diff[rin-1]) &&
+                   CMP(b, in_diff[rin]))
                         goto next;
 
                 if(wbuf + 32 >= n_buf)

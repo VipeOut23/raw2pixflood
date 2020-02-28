@@ -5,5 +5,4 @@ tmp/
 
 *.o
 raw2pixflood
-*.sh
 *.webm

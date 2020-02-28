@@ -6,7 +6,7 @@ ALLCFLAGS = $(CFLAGS) $(shell echo | gcc -xc -E -v - 2>&1 | grep -E '^\s' | sed 
 OBJ= raw2pixflood.o
 
 raw2pixflood: $(OBJ)
-	$(CC) $(ALLCFLAGS) $(OBJ) -o raw2pixflood
+	$(CC) $(ALLCFLAGS) $(OBJ) -DTHRESH=$(thresh) -o raw2pixflood
 
 run: raw2pixflood
 	./raw2pixflood $(ARGS)
