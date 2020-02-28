@@ -11,6 +11,56 @@
 
 #define CMP(x,y) (((x-y) <= THRESH) && ((y-x) <= THRESH))
 
+static char nibbles[16] = "0123456789ABCDEF";
+
+static inline size_t format(char* buf, uint16_t x, uint16_t y, uint8_t r, uint8_t g, uint8_t b)
+{
+        int d = 0;
+        int dt;
+        size_t idx = 3;
+
+        buf[0] = 'P';
+        buf[1] = 'X';
+        buf[2] = ' ';
+
+        /* x coordinate */
+        d=1;
+        if(x>=10) d=2;
+        if(x>=100) d=3;
+        if(x>=1000) d=4;
+        if(x>=10000) d=5;
+        dt = d;
+        for(; d; d--, x/=10) buf[idx+(d-1)] = nibbles[x % 10];
+        idx += dt;
+
+        buf[idx++] = ' ';
+
+        /* y coordinate */
+        d=1;
+        if(y>=10) d=2;
+        if(y>=100) d=3;
+        if(y>=1000) d=4;
+        if(y>=10000) d=5;
+        dt = d;
+        for(; d; d--, y/=10) buf[idx+(d-1)] = nibbles[y % 10];
+        idx += dt;
+
+        buf[idx++] = ' ';
+
+        /* color value as hex */
+        buf[idx++] = nibbles[r >> 4];
+        buf[idx++] = nibbles[r & 0xF];
+        buf[idx++] = nibbles[g >> 4];
+        buf[idx++] = nibbles[g & 0xF];
+        buf[idx++] = nibbles[b >> 4];
+        buf[idx++] = nibbles[b & 0xF];
+
+        buf[idx++] = '\n';
+
+        return idx;
+}
+
+
 int write_pixbuf(int fd, uint16_t x, uint16_t y,
                  uint16_t in_width, uint16_t in_height, uint8_t *raw_in,
                  uint8_t *in_diff, size_t n_in, char *buf, size_t n_buf)
@@ -34,7 +84,7 @@ int write_pixbuf(int fd, uint16_t x, uint16_t y,
                 if(wbuf + 32 >= n_buf)
                         break;
 
-                written = sprintf(buf+wbuf, "PX %d %d %02x%02x%02x\n",
+                written = format(buf+wbuf,
                                   wx, wy, r, g, b);
                 wbuf += written;
 
